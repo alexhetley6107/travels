@@ -1,11 +1,119 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { PlacesService } from '../../entities/place/place.service';
+import { PlaceDetails } from '../../entities/place/model';
 
 @Component({
   selector: 'app-search-page',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './search-page.component.html',
-  styleUrl: './search-page.component.scss'
+  styleUrl: './search-page.component.scss',
 })
 export class SearchPageComponent {
+  private readonly placesService = inject(PlacesService);
+  private readonly router = inject(Router);
 
+  query = '';
+  places = signal<PlaceDetails[]>([]);
+  loading = signal(false);
+  locating = signal(false);
+  error = signal<string | null>(null);
+
+  search(): void {
+    const q = this.query.trim();
+    if (!q) return;
+
+    this.loading.set(true);
+    this.error.set(null);
+    this.places.set([]);
+
+    this.placesService.searchPlaces({ query: q, limit: 10 }).subscribe({
+      next: (previews) => {
+        if (!previews.length) {
+          this.loading.set(false);
+          return;
+        }
+        this.placesService.getPlacesBatch(previews).subscribe({
+          next: (details) => {
+            this.places.set(details);
+            this.loading.set(false);
+          },
+          error: (err: Error) => {
+            this.error.set(err.message);
+            this.loading.set(false);
+          },
+        });
+      },
+      error: (err: Error) => {
+        this.error.set(err.message);
+        this.loading.set(false);
+      },
+    });
+  }
+
+  // searchNearby(): void {
+  //   if (!navigator.geolocation) {
+  //     this.error.set('Геолокація не підтримується браузером');
+  //     return;
+  //   }
+
+  //   this.locating.set(true);
+  //   this.error.set(null);
+  //   this.places.set([]);
+
+  //   navigator.geolocation.getCurrentPosition(
+  //     ({ coords }) => {
+  //       this.locating.set(false);
+  //       this.loading.set(true);
+
+  //       this.placesService
+  //         .searchNearby(coords.latitude, coords.longitude, { limit: 10 })
+  //         .subscribe({
+  //           next: (previews) => {
+  //             if (!previews.length) {
+  //               this.loading.set(false);
+  //               return;
+  //             }
+  //             this.placesService.getPlacesBatch(previews).subscribe({
+  //               next: (details) => {
+  //                 this.places.set(details);
+  //                 this.loading.set(false);
+  //               },
+  //               error: (err: Error) => {
+  //                 this.error.set(err.message);
+  //                 this.loading.set(false);
+  //               },
+  //             });
+  //           },
+  //           error: (err: Error) => {
+  //             this.error.set(err.message);
+  //             this.loading.set(false);
+  //           },
+  //         });
+  //     },
+  //     () => {
+  //       this.locating.set(false);
+  //       this.error.set('Не вдалося отримати геолокацію');
+  //     }
+  //   );
+  // }
+
+  onKeydown(e: KeyboardEvent): void {
+    if (e.key === 'Enter') this.search();
+  }
+
+  openPlace(xid: string): void {
+    this.router.navigate(['/place', xid]);
+  }
+
+  address(place: PlaceDetails): string {
+    return this.placesService.formatAddress(place);
+  }
+
+  category(place: PlaceDetails): string {
+    return place.kinds ? this.placesService.formatKinds(place.kinds) : '';
+  }
 }
