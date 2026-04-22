@@ -1,1 +1,15 @@
-{{ places }}
+@if (places.length) {
+  <div class="places-grid">
+    @for (place of places; track place.xid) {
+      <div class="places-grid">
+        <app-place-card [place]="place" />
+      </div>
+    }
+  </div>
+}
+
+@if (!places.length) {
+  <div class="empty-state">
+    <p>У вас ще немає збережених місць</p>
+  </div>
+}
