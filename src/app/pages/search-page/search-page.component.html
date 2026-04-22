@@ -30,33 +30,7 @@
   <p class="results-count">Знайдено: {{ places().length }}</p>
   <div class="places-grid">
     @for (place of places(); track place.xid) {
-      <div class="place-card" (click)="openPlace(place.xid)">
-        <div class="card-photo">
-          @if (place.preview?.source) {
-            <img [src]="place.preview!.source" [alt]="place.name" loading="lazy" />
-          } @else {
-            <span class="no-photo">🏛️</span>
-          }
-        </div>
-
-        <div class="card-body">
-          @if (category(place)) {
-            <span class="card-category">{{ category(place) }}</span>
-          }
-          <h3 class="card-name">{{ place.name }}</h3>
-          @if (address(place)) {
-            <p class="card-address">{{ address(place) }}</p>
-          }
-          @if (place.wikipedia_extracts?.text) {
-            <p class="card-desc">{{ place.wikipedia_extracts!.text }}</p>
-          }
-          @if (place.rate) {
-            <div class="card-meta">
-              <span class="card-rating">★ {{ place.rate }}</span>
-            </div>
-          }
-        </div>
-      </div>
+      <app-place-card [place]="place" />
     }
   </div>
 }

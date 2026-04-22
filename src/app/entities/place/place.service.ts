@@ -125,13 +125,13 @@ export class PlacesService {
     );
   }
 
-  formatAddress(place: PlaceDetails): string {
-    const a = place.address;
+  formatAddress(place?: PlaceDetails): string {
+    const a = place?.address;
     if (!a) return '';
     return [a.road, a.house_number, a.city, a.country].filter(Boolean).join(', ');
   }
 
-  formatKinds(kinds: string): string {
+  formatKinds(kinds: string = ''): string {
     return kinds
       .split(',')[0]
       .replace(/_/g, ' ')
