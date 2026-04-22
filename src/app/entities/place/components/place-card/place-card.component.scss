@@ -82,13 +82,8 @@
   line-height: 1.45;
 }
 
-.card-meta {
-  margin-top: auto;
-  padding-top: 0.5rem;
-}
-
-.card-rating {
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: #ca8a04;
+.card-action {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.875rem 1rem 1rem;
 }

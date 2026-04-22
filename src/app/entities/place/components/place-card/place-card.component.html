@@ -1,27 +1,28 @@
-<div class="place-card" (click)="openPlace()">
-  <div class="card-photo">
-    @if (place()?.preview?.source) {
-      <img [src]="place()?.preview!.source" [alt]="place()?.name" loading="lazy" />
-    } @else {
-      <span class="no-photo">🏛️</span>
-    }
-  </div>
+<div class="place-card">
+  <div class="card-clickable" (click)="openPlace()">
+    <div class="card-photo">
+      @if (place().preview?.source) {
+        <img [src]="place().preview!.source" [alt]="place().name" loading="lazy" />
+      } @else {
+        <span class="no-photo">🏛️</span>
+      }
+    </div>
 
-  <div class="card-body">
-    @if (category()) {
-      <span class="card-category">{{ category() }}</span>
-    }
-    <h3 class="card-name">{{ place()?.name }}</h3>
-    @if (address()) {
-      <p class="card-address">{{ address() }}</p>
-    }
-    @if (place()?.wikipedia_extracts?.text) {
-      <p class="card-desc">{{ place()?.wikipedia_extracts!.text }}</p>
-    }
-    @if (place()?.rate) {
-      <div class="card-meta">
-        <span class="card-rating">★ {{ place()?.rate }}</span>
-      </div>
-    }
+    <div class="card-body">
+      <h3 class="card-name">{{ place().name }}</h3>
+
+      @if (place().wikipedia_extracts?.text) {
+        <p class="card-desc">{{ place().wikipedia_extracts!.text }}</p>
+      }
+    </div>
+  </div>
+  <div class="card-action">
+    <button
+      class="btn"
+      [ngClass]="isWished() ? 'btn-outlined' : 'btn-primary'"
+      (click)="onToggle()"
+    >
+      {{ isWished() ? 'Видалити' : 'Додати' }}
+    </button>
   </div>
 </div>

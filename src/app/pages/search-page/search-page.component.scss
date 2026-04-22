@@ -19,43 +19,6 @@
   }
 }
 
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.65rem 1.25rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  min-width: 90px;
-  transition:
-    background 0.2s,
-    opacity 0.2s;
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-}
-
-.btn-primary {
-  background: #4f46e5;
-  color: #fff;
-  &:not(:disabled):hover {
-    background: #4338ca;
-  }
-}
-
-.btn-outline {
-  background: #fff;
-  color: #4f46e5;
-  border: 1.5px solid #4f46e5;
-  &:not(:disabled):hover {
-    background: #eef2ff;
-  }
-}
-
 .spinner {
   display: inline-block;
   width: 16px;
