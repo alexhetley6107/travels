@@ -1,5 +1,5 @@
 import { computed, Injectable, signal } from '@angular/core';
-import { PlaceDetails } from '../place/model';
+import { PlaceDetails } from '../model';
 
 const KEY = 'wishlist';
 
@@ -16,8 +16,6 @@ export class WishlistService {
   initPlaces() {
     const json = localStorage.getItem(KEY);
     const saved: WishlistState = json ? JSON.parse(json) : {};
-
-    console.log(saved);
 
     this.state.set(saved);
   }

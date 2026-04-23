@@ -1,7 +1,7 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PlacesService } from '../../entities/place/place.service';
+import { PlacesService } from '../../entities/place/services/place.service';
 import { PlaceDetails } from '../../entities/place/model';
 
 @Component({
@@ -39,17 +39,17 @@ export class PlacePageComponent implements OnInit {
     });
   }
 
-  goBack(): void {
-    this.router.navigate(['/']);
-  }
-
   address(): string {
-    const p = this.place();
-    return p ? this.placesService.formatAddress(p) : '';
+    const a = this.place()?.address;
+    if (!a) return '';
+    return [a.road, a.house_number, a.city, a.country].filter(Boolean).join(', ');
   }
 
   category(): string {
-    const p = this.place();
-    return p?.kinds ? this.placesService.formatKinds(p.kinds) : '';
+    const kinds = this.place()?.kinds ?? '';
+    return kinds
+      .split(',')[0]
+      .replace(/_/g, ' ')
+      .replace(/^\w/, (c) => c.toUpperCase());
   }
 }

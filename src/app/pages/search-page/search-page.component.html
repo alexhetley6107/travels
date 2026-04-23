@@ -13,13 +13,13 @@
       Пошук
     }
   </button>
-  <!-- <button class="btn btn-outline" (click)="searchNearby()" [disabled]="locating() || loading()">
-      @if (locating()) {
-        <span class="spinner"></span>
-      } @else {
-        Поруч
-      }
-    </button> -->
+  <button class="btn btn-outline" (click)="searchNearby()" [disabled]="locating() || loading()">
+    @if (locating()) {
+      <span class="spinner"></span>
+    } @else {
+      Поруч
+    }
+  </button>
 </div>
 
 @if (error()) {

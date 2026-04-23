@@ -2,8 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of, switchMap, from, map, tap, concatMap, toArray, catchError } from 'rxjs';
 import { delay } from 'rxjs/operators';
-import { PlaceDetails, PlacePreview, SearchParams } from './model';
-import { env } from '../../../environments/environments';
+import { PlaceDetails, PlacePreview, SearchParams } from '../model';
+import { env } from '../../../../environments/environments';
 
 interface CacheEntry {
   data: unknown;
@@ -121,18 +121,5 @@ export class PlacesService {
       toArray(),
       map((results) => results.filter((d): d is PlaceDetails => !!d && !!d.name))
     );
-  }
-
-  formatAddress(place?: PlaceDetails): string {
-    const a = place?.address;
-    if (!a) return '';
-    return [a.road, a.house_number, a.city, a.country].filter(Boolean).join(', ');
-  }
-
-  formatKinds(kinds: string = ''): string {
-    return kinds
-      .split(',')[0]
-      .replace(/_/g, ' ')
-      .replace(/^\w/, (c) => c.toUpperCase());
   }
 }
