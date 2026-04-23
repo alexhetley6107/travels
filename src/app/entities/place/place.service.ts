@@ -3,16 +3,14 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of, switchMap, from, map, tap, concatMap, toArray, catchError } from 'rxjs';
 import { delay } from 'rxjs/operators';
 import { PlaceDetails, PlacePreview, SearchParams } from './model';
+import { env } from '../../../environments/environments';
 
 interface CacheEntry {
   data: unknown;
   expiresAt: number;
 }
 
-const CACHE_TTL = 10 * 60 * 1000; // 10 min
-
-const API_KEY = '5ae2e3f221c38a28845f05b602f851ea276066b0d5904690c7999e74';
-const BASE_URL = 'https://api.opentripmap.com/0.1/en/places';
+const CACHE_TIME = 10 * 60 * 1000;
 const TOURIST_KINDS = 'interesting_places,cultural,historic,architecture,museums,natural,religion';
 
 @Injectable({ providedIn: 'root' })
@@ -31,7 +29,7 @@ export class PlacesService {
   }
 
   private cacheSet(key: string, data: unknown): void {
-    this.cache.set(key, { data, expiresAt: Date.now() + CACHE_TTL });
+    this.cache.set(key, { data, expiresAt: Date.now() + CACHE_TIME });
   }
 
   geocode(query: string): Observable<{ lat: number; lon: number; name: string }> {
@@ -39,10 +37,10 @@ export class PlacesService {
     const cached = this.cacheGet<{ lat: number; lon: number; name: string }>(key);
     if (cached) return of(cached);
 
-    const params = new HttpParams().set('name', query).set('apikey', API_KEY);
+    const params = new HttpParams().set('name', query).set('apikey', env.API_KEY);
 
     return this.http
-      .get<{ lat: number; lon: number; name: string }>(`${BASE_URL}/geoname`, { params })
+      .get<{ lat: number; lon: number; name: string }>(`${env.BASE_URL}/geoname`, { params })
       .pipe(tap((r) => this.cacheSet(key, r)));
   }
 
@@ -87,10 +85,10 @@ export class PlacesService {
       .set('limit', String(limit))
       .set('rate', '2')
       .set('format', 'json')
-      .set('apikey', API_KEY);
+      .set('apikey', env.API_KEY);
 
     return this.http
-      .get<PlacePreview[]>(`${BASE_URL}/radius`, { params })
+      .get<PlacePreview[]>(`${env.BASE_URL}/radius`, { params })
       .pipe(tap((r) => this.cacheSet(key, r)));
   }
 
@@ -99,10 +97,10 @@ export class PlacesService {
     const cached = this.cacheGet<PlaceDetails>(key);
     if (cached) return of(cached);
 
-    const params = new HttpParams().set('apikey', API_KEY);
+    const params = new HttpParams().set('apikey', env.API_KEY);
 
     return this.http
-      .get<PlaceDetails>(`${BASE_URL}/xid/${xid}`, { params })
+      .get<PlaceDetails>(`${env.BASE_URL}/xid/${xid}`, { params })
       .pipe(tap((p) => this.cacheSet(key, p)));
   }
 
