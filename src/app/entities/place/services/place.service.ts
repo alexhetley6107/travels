@@ -18,7 +18,7 @@ export class PlacesService {
   private readonly http = inject(HttpClient);
   private readonly cache = new Map<string, CacheEntry>();
 
-  cacheGet<T>(key: string): T | null {
+  private cacheGet<T>(key: string): T | null {
     const entry = this.cache.get(key);
     if (!entry) return null;
     if (Date.now() > entry.expiresAt) {
@@ -32,7 +32,7 @@ export class PlacesService {
     this.cache.set(key, { data, expiresAt: Date.now() + CACHE_TIME });
   }
 
-  geocode(query: string): Observable<{ lat: number; lon: number; name: string }> {
+  private geocode(query: string): Observable<{ lat: number; lon: number; name: string }> {
     const key = `geo:${query.toLowerCase()}`;
     const cached = this.cacheGet<{ lat: number; lon: number; name: string }>(key);
     if (cached) return of(cached);
@@ -49,9 +49,6 @@ export class PlacesService {
       return this.geocode(params.query).pipe(
         switchMap((geo) => this.searchByCoords(geo.lat, geo.lon, params))
       );
-    }
-    if (params.lat !== undefined && params.lon !== undefined) {
-      return this.searchByCoords(params.lat, params.lon, params);
     }
     return of([]);
   }
@@ -70,7 +67,7 @@ export class PlacesService {
     options: SearchParams
   ): Observable<PlacePreview[]> {
     const radius = options.radius ?? 5000;
-    const limit = options.limit ?? 10;
+    const limit = options.limit ?? 8;
     const kinds = options.kinds ?? TOURIST_KINDS;
     const key = `search:${lat}:${lon}:${radius}:${limit}:${kinds}`;
 
@@ -104,20 +101,11 @@ export class PlacesService {
       .pipe(tap((p) => this.cacheSet(key, p)));
   }
 
-  /**
-   * Load details for a list of previews sequentially with 300ms delay
-   * to avoid 429 rate limit errors.
-   */
   getPlacesBatch(previews: PlacePreview[]): Observable<PlaceDetails[]> {
     if (!previews.length) return of([]);
 
     return from(previews).pipe(
-      concatMap((p, i) =>
-        this.getPlace(p.xid).pipe(
-          delay(i < 7 ? 0 : 300),
-          catchError(() => of(null))
-        )
-      ),
+      concatMap((p) => this.getPlace(p.xid).pipe(catchError(() => of(null)))),
       toArray(),
       map((results) => results.filter((d): d is PlaceDetails => !!d && !!d.name))
     );

@@ -1,5 +1,4 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PlacesService } from '../../entities/place/services/place.service';
 import { PlaceDetails } from '../../entities/place/model';
@@ -7,7 +6,7 @@ import { PlaceDetails } from '../../entities/place/model';
 @Component({
   selector: 'app-place-page',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './place-page.component.html',
   styleUrl: './place-page.component.scss',
 })

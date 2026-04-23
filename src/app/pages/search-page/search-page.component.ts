@@ -1,7 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { PlacesService } from '../../entities/place/services/place.service';
 import { PlaceDetails } from '../../entities/place/model';
 import { PlaceCardComponent } from '../../entities/place/components/place-card/place-card.component';
@@ -9,13 +8,12 @@ import { PlaceCardComponent } from '../../entities/place/components/place-card/p
 @Component({
   selector: 'app-search-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, PlaceCardComponent],
+  imports: [FormsModule, PlaceCardComponent],
   templateUrl: './search-page.component.html',
   styleUrl: './search-page.component.scss',
 })
 export class SearchPageComponent {
   private readonly placesService = inject(PlacesService);
-  private readonly router = inject(Router);
 
   query = '';
   places = signal<PlaceDetails[]>([]);
@@ -31,7 +29,7 @@ export class SearchPageComponent {
     this.error.set(null);
     this.places.set([]);
 
-    this.placesService.searchPlaces({ query: q, limit: 10 }).subscribe({
+    this.placesService.searchPlaces({ query: q, limit: 8 }).subscribe({
       next: (previews) => {
         if (!previews.length) {
           this.loading.set(false);
@@ -70,30 +68,28 @@ export class SearchPageComponent {
         this.locating.set(false);
         this.loading.set(true);
 
-        this.placesService
-          .searchNearby(coords.latitude, coords.longitude, { limit: 10 })
-          .subscribe({
-            next: (previews) => {
-              if (!previews.length) {
-                this.loading.set(false);
-                return;
-              }
-              this.placesService.getPlacesBatch(previews).subscribe({
-                next: (details) => {
-                  this.places.set(details);
-                  this.loading.set(false);
-                },
-                error: (err: Error) => {
-                  this.error.set(err.message);
-                  this.loading.set(false);
-                },
-              });
-            },
-            error: (err: Error) => {
-              this.error.set(err.message);
+        this.placesService.searchNearby(coords.latitude, coords.longitude, { limit: 8 }).subscribe({
+          next: (previews) => {
+            if (!previews.length) {
               this.loading.set(false);
-            },
-          });
+              return;
+            }
+            this.placesService.getPlacesBatch(previews).subscribe({
+              next: (details) => {
+                this.places.set(details);
+                this.loading.set(false);
+              },
+              error: (err: Error) => {
+                this.error.set(err.message);
+                this.loading.set(false);
+              },
+            });
+          },
+          error: (err: Error) => {
+            this.error.set(err.message);
+            this.loading.set(false);
+          },
+        });
       },
       () => {
         this.locating.set(false);
