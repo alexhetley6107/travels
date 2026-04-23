@@ -4,6 +4,7 @@ import { Observable, of, switchMap, from, map, tap, concatMap, toArray, catchErr
 import { delay } from 'rxjs/operators';
 import { PlaceDetails, PlacePreview, SearchParams } from '../model';
 import { env } from '../../../../environments/environments';
+import { WishlistService } from './wishlist.service';
 
 interface CacheEntry {
   data: unknown;
@@ -16,6 +17,7 @@ const TOURIST_KINDS = 'interesting_places,cultural,historic,architecture,museums
 @Injectable({ providedIn: 'root' })
 export class PlacesService {
   private readonly http = inject(HttpClient);
+  private readonly wishlist = inject(WishlistService);
   private readonly cache = new Map<string, CacheEntry>();
 
   private cacheGet<T>(key: string): T | null {
@@ -90,6 +92,9 @@ export class PlacesService {
   }
 
   getPlace(xid: string): Observable<PlaceDetails> {
+    const isWished = this.wishlist.has(xid);
+    if (isWished) return of(this.wishlist.get(xid));
+
     const key = `place:${xid}`;
     const cached = this.cacheGet<PlaceDetails>(key);
     if (cached) return of(cached);
